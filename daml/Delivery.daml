@@ -1,0 +1,85 @@
+module Delivery where
+
+import Types
+
+template DeliveryRequest
+  with
+    foodCartId : Int
+    app : Party
+    deliveryBroker : Party
+    pickupAddress : Address
+    dropoffAddress : Address
+  where
+      signatory app
+      observer deliveryBroker
+      choice RequestBids : ContractId DeliveryBidRequest
+        with
+          deliveryDrivers : [Party]
+        controller deliveryBroker
+        do
+          create DeliveryBidRequest with
+            foodCartId = foodCartId
+            deliveryBroker = deliveryBroker
+            deliveryDrivers = deliveryDrivers
+            pickupAddress = pickupAddress
+            dropoffAddress = dropoffAddress
+
+template DeliveryBidRequest
+  with
+    foodCartId : Int
+    deliveryBroker : Party
+    deliveryDrivers: [Party]
+    pickupAddress : Address
+    dropoffAddress : Address
+  where
+    signatory deliveryBroker
+    observer deliveryDrivers
+    nonconsuming choice Bid : ContractId DeliveryBid
+      with
+        deliveryDriver : Party
+        fee : Decimal
+      controller deliveryDriver
+      do
+        create DeliveryBid with
+          request = this
+          deliveryDriver = deliveryDriver
+          deliveryBroker = deliveryBroker
+          fee = fee
+
+template DeliveryBid
+  with
+    request : DeliveryBidRequest
+    deliveryDriver : Party
+    deliveryBroker: Party
+    fee : Decimal
+  where
+    signatory deliveryDriver
+    observer deliveryBroker
+    choice Accept : ContractId DeliveryContract
+      with
+        app : Party
+      controller deliveryBroker
+      do
+        create DeliveryContract with
+          foodCartId = request.foodCartId
+          deliveryDriver = deliveryDriver
+          app = app
+          deliveryBroker = deliveryBroker
+          pickupAddress = request.pickupAddress
+          dropoffAddress = request.dropoffAddress
+          fee = fee
+
+template DeliveryContract
+  with
+    foodCartId : Int
+    deliveryDriver : Party
+    app : Party
+    deliveryBroker: Party
+    pickupAddress : Text
+    dropoffAddress : Text
+    fee : Decimal
+  where
+    signatory deliveryBroker
+    observer deliveryDriver
+    observer app
+ 

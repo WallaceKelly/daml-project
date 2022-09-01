@@ -54,3 +54,27 @@ isCartAcceptable --> ordering: Edit cart
 isCartAcceptable --> cartSubmitted: Guest pays
 cartSubmitted --> [*]
 ```
+
+## Observations
+
+* The documentation is awesome.
+* The VS Code extension is a huge help.
+* F# did a good job preparing me.
+* As I thought more about the domain and as I refactored the Daml code, the solution became simpler and more correct.
+
+## Questions
+
+* Are clients using this to persist data that is not really required for the contract?
+
+## Improvements?
+
+* The VS Code Snippet for choice could be improved (to match some of the samples in the tutorials)
+* Allow | character before the first value of a sum types.
+
+    ```daml
+    data PosValidation =
+        | Valid with price : Decimal
+        | Invalid with msg : Text
+    ```
+
+* When to create a template with an Optional member that gets set by a choice... and when to just create a second template? (e.g., FoodCart.Validate)

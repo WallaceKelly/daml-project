@@ -1,0 +1,4 @@
+module Types where
+
+type MenuItem = Text
+type Address = Text

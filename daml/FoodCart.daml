@@ -1,0 +1,47 @@
+module FoodCart where
+
+import DA.Optional (isNone, fromSome)
+
+import Types
+import PointOfSale
+import Delivery
+
+template FoodCart
+
+  with
+    foodCartId : Int -- TODO: make this a key?
+    app : Party
+    items : [ MenuItem ]
+    pickupAddress : Address 
+    dropoffAddress : Address
+    pointOfSale : Party
+    posValidation : Optional PosValidation
+
+  where
+    signatory app
+    observer pointOfSale
+
+    choice Validate : ContractId FoodCart
+      with
+        validation : PosValidation
+      controller pointOfSale
+      do
+        create this with
+          posValidation = Some validation
+    
+    choice RequestDelivery : ContractId DeliveryRequest
+      with 
+        deliveryBroker : Party
+      controller app
+      do
+        assertMsg "Cannot request delivery before POS validation." (isNone posValidation)
+        case fromSome posValidation of
+          Invalid reason -> error reason
+          Valid subtotal tax ->
+            create DeliveryRequest with
+              foodCartId = foodCartId
+              app = app
+              deliveryBroker = deliveryBroker
+              pickupAddress = pickupAddress
+              dropoffAddress = dropoffAddress
+ 

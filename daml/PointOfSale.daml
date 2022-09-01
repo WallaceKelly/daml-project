@@ -1,0 +1,6 @@
+module PointOfSale where
+
+data PosValidation 
+  = Valid with subtotal : Decimal, tax : Decimal
+  | Invalid with reason : Text
+  deriving (Eq, Show)
