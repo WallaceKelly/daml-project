@@ -1,6 +1,6 @@
 module FoodCart where
 
-import DA.Optional (isNone, fromSome)
+import DA.Optional (isSome, fromSome)
 
 import Types
 import PointOfSale
@@ -37,7 +37,7 @@ template FoodCart
         deliveryBroker : Party
       controller app
       do
-        assertMsg "Cannot request delivery before POS validation." (isNone posValidation)
+        assertMsg "Cannot request delivery before POS validation." (isSome posValidation)
         case fromSome posValidation of
           Invalid reason -> error reason
           Valid subtotal tax ->
