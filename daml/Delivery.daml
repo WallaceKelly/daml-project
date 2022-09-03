@@ -1,6 +1,8 @@
 module Delivery where
 
 import Types
+import DA.Optional (isSome)
+import DA.List (elemIndex)
 
 type DeliveryBidRequestId = ContractId DeliveryBidRequest
 type DeliveryBidId = ContractId DeliveryBid
@@ -44,6 +46,8 @@ template DeliveryBidRequest
         fee : Decimal
       controller deliveryDriver
       do
+        -- TODO: Why does this following not compile?
+        -- assert "Only invited bidders may bid" (isSome (elemIndex deliveryDriver deliveryDrivers))
         create DeliveryBid with
           request = this
           deliveryDriver = deliveryDriver
