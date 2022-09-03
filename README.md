@@ -59,6 +59,7 @@ cartSubmitted --> [*]
 
 * The documentation is awesome.
 * The VS Code extension is a huge help.
+* The first impression of tooling is very positive. (`daml version` displayed the latest release; `daml install 2.3.4` downloaded the latest release; side-by-side installation of different versions, etc.)
 * F# did a good job preparing me.
 * As I thought more about the domain and as I refactored the Daml code, the solution became simpler and more correct.
 
