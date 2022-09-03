@@ -2,6 +2,10 @@ module Delivery where
 
 import Types
 
+type DeliveryBidRequestId = ContractId DeliveryBidRequest
+type DeliveryBidId = ContractId DeliveryBid
+type DeliveryContractId = ContractId DeliveryContract
+
 template DeliveryRequest
   with
     foodCartId : Int
@@ -12,7 +16,7 @@ template DeliveryRequest
   where
       signatory app
       observer deliveryBroker
-      choice RequestBids : ContractId DeliveryBidRequest
+      choice RequestBids : DeliveryBidRequestId
         with
           deliveryDrivers : [Party]
         controller deliveryBroker
@@ -34,7 +38,7 @@ template DeliveryBidRequest
   where
     signatory deliveryBroker
     observer deliveryDrivers
-    nonconsuming choice Bid : ContractId DeliveryBid
+    nonconsuming choice Bid : DeliveryBidId
       with
         deliveryDriver : Party
         fee : Decimal
@@ -55,7 +59,7 @@ template DeliveryBid
   where
     signatory deliveryDriver
     observer deliveryBroker
-    choice Accept : ContractId DeliveryContract
+    choice Accept : DeliveryContractId
       with
         app : Party
       controller deliveryBroker

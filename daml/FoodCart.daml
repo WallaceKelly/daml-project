@@ -6,6 +6,9 @@ import Types
 import PointOfSale
 import Delivery
 
+type FoodCartId = ContractId FoodCart
+type DeliveryRequestId = ContractId DeliveryRequest
+
 template FoodCart
 
   with
@@ -21,7 +24,7 @@ template FoodCart
     signatory app
     observer pointOfSale
 
-    choice Validate : ContractId FoodCart
+    choice Validate : FoodCartId
       with
         validation : PosValidation
       controller pointOfSale
@@ -29,7 +32,7 @@ template FoodCart
         create this with
           posValidation = Some validation
     
-    choice RequestDelivery : ContractId DeliveryRequest
+    choice RequestDelivery : DeliveryRequestId
       with 
         deliveryBroker : Party
       controller app
