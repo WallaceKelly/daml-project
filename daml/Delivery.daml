@@ -53,6 +53,7 @@ template DeliveryBidRequest
           deliveryDriver = deliveryDriver
           deliveryBroker = deliveryBroker
           fee = fee
+          isRejected = False
 
 template DeliveryBid
   with
@@ -60,6 +61,8 @@ template DeliveryBid
     deliveryDriver : Party
     deliveryBroker: Party
     fee : Decimal
+    -- Is there anything like default values?
+    isRejected : Bool -- = False
   where
     signatory deliveryDriver
     observer deliveryBroker
@@ -76,6 +79,10 @@ template DeliveryBid
           pickupAddress = request.pickupAddress
           dropoffAddress = request.dropoffAddress
           fee = fee
+    choice Reject : DeliveryBidId
+      controller deliveryBroker
+      do
+        create this with isRejected = True
 
 template DeliveryContract
   with
