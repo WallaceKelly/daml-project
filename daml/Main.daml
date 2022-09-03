@@ -2,43 +2,72 @@ module Main where
 
 import Daml.Script
 
-type AssetId = ContractId Asset
+import FoodCart
+import PointOfSale
+import Delivery
 
-template Asset
-  with
-    issuer : Party
-    owner  : Party
-    name   : Text
-  where
-    ensure name /= ""
-    signatory issuer
-    observer owner
-    choice Give : AssetId
-      with
-        newOwner : Party
-      controller owner
-      do create this with
-           owner = newOwner
+happyPath : Script ()
+happyPath = script do
 
-setup : Script AssetId
-setup = script do
--- user_setup_begin
-  alice <- allocatePartyWithHint "Alice" (PartyIdHint "Alice")
-  bob <- allocatePartyWithHint "Bob" (PartyIdHint "Bob")
-  aliceId <- validateUserId "alice"
-  bobId <- validateUserId "bob"
-  createUser (User aliceId (Some alice)) [CanActAs alice]
-  createUser (User bobId (Some bob)) [CanActAs bob]
--- user_setup_end
+  let shakeShackAddress = "200 Broadway, New York, NY"
+  let daOfficeAddress = "150 Greenwich Street, 47th floor, New York, NY"
 
-  aliceTV <- submit alice do
-    createCmd Asset with
-      issuer = alice
-      owner = alice
-      name = "TV"
+  -- the Parties for creating the cart
 
-  bobTV <- submit alice do
-    exerciseCmd aliceTV Give with newOwner = bob
+  shakeShack <- allocateParty "ShakeShack"
+  lightSpeed <- allocateParty "LightSpeed"
 
-  submit bob do
-    exerciseCmd bobTV Give with newOwner = alice
+  -- create and validate the cart
+
+  foodCartId <- submit shakeShack do
+    createCmd FoodCart with
+      foodCartId = 42
+      app = shakeShack
+      items = [ "Burger", "Fries", "Shake" ]
+      pickupAddress = shakeShackAddress
+      dropoffAddress = daOfficeAddress
+      pointOfSale = lightSpeed
+      posValidation = None
+
+  foodCartId <- submit lightSpeed do
+    exerciseCmd foodCartId Validate with
+      validation = Valid 11.95 3.45 
+
+  -- the Parties for arranging the delivery
+
+  dispatch <- allocateParty "Dispatch"
+  doorDash <- allocateParty "DoorDash"
+  grubHub <- allocateParty "GrubHub"
+
+  -- request bids from delivery services
+  
+  deliveryRequestId <- submit shakeShack do
+    exerciseCmd foodCartId RequestDelivery with
+      deliveryBroker = dispatch
+  
+  deliveryBidRequestId <- submit dispatch do
+    exerciseCmd deliveryRequestId RequestBids with
+      deliveryDrivers = [ doorDash, grubHub ]
+
+  -- receive bids from delivery services
+
+  doorDashBidId <- submit doorDash do
+    exerciseCmd deliveryBidRequestId Bid with
+      deliveryDriver = doorDash
+      fee = 6.99
+
+  grubHubBidId <- submit grubHub do
+    exerciseCmd deliveryBidRequestId Bid with
+      deliveryDriver = grubHub
+      fee = 5.99
+
+  -- award the delivery contract to one service
+
+  deliveryContractId <- submit dispatch do
+    exerciseCmd grubHubBidId Accept with
+      app = shakeShack
+  submit dispatch do archiveCmd deliveryBidRequestId
+  
+  doorDashRejectionId <- submit dispatch do
+    exerciseCmd doorDashBidId Reject
+  submit doorDash do archiveCmd doorDashRejectionId 
