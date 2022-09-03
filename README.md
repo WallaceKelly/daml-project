@@ -55,6 +55,12 @@ isCartAcceptable --> cartSubmitted: Guest pays
 cartSubmitted --> [*]
 ```
 
+## Daml Contract Visualization
+
+This diagram was generated using [this technique](https://docs.daml.com/tools/visual.html).
+
+![diagram of contract interactions](visualized-contracts.png)
+
 ## Observations
 
 * The documentation is awesome.
@@ -90,3 +96,5 @@ cartSubmitted --> [*]
 * When viewing error messages on the command line, [my Windows PowerShell Core terminal did not respect some of the character codes](./unrespected-char-codes.png).
 
 * It would be nice if [script error messages were available on the script results page](./error-msg-in-script-results.png).
+
+* Submitted [a PR to the docs](https://github.com/digital-asset/daml/pull/14924) regarding the new "[Visualizing Daml Contracts](https://docs.daml.com/tools/visual.html)" feature.
