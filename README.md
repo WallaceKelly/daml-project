@@ -78,6 +78,8 @@ This diagram was generated using [this technique](https://docs.daml.com/tools/vi
 
 * Can a choice create two contracts (e.g., Accepting a bid should should create the DeliveryContract _and_ archive the DeliveryBidRequest)
 
+* I noticed the "Witness" role in the script results. What is that?
+
 ## Improvements?
 
 * The VS Code Snippet for `choice` could be improved (to match some of the samples in the tutorials)
